@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     public GameObject bullet;
     public float speed = 1.0f;      // 플레이어의 이동 속도(초당 이동 속도)
     public float fireInterval = 0.5f;
-
+    public GameObject explosionPrefab;
     Vector3 dir;                    // 이동 방향(입력에 따라 변경됨)
     float boost = 1.0f;
 
@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
 
     Transform firePositionRoot;
     GameObject flash;
+    
 
     float fireAngle = 30.0f;
     int power = 0;
@@ -79,6 +80,8 @@ public class Player : MonoBehaviour
         firePositionRoot = transform.GetChild(0);
         flash = transform.GetChild(1).gameObject;
         flash.SetActive(false);
+
+        
 
         fireCoroutine = Fire();
     }
@@ -171,6 +174,16 @@ public class Player : MonoBehaviour
             Power++;    // 파워 증가
             Destroy(collision.gameObject);
         }
+
+        if(collision.gameObject.CompareTag("Enemy"))
+        {
+            Dead();
+        }
+    }
+
+    void Dead()
+    {
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

@@ -18,4 +18,6 @@ public class Explosion : MonoBehaviour
         // anim.GetCurrentAnimatorClipInfo(0)[0].clip.length초 후에 이 게임 오브젝트를 삭제하라
         Destroy(this.gameObject, anim.GetCurrentAnimatorClipInfo(0)[0].clip.length);
     }
+
+   
 }

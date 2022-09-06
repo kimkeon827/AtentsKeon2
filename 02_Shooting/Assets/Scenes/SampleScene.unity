@@ -831,6 +831,8 @@ MonoBehaviour:
   moveSpeed: 10
   minRightEnd: 40
   maxRightEnd: 60
+  minHeight: -8
+  maxHeight: -5
 --- !u!212 &1673957463
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1094,6 +1096,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 1691559466406857893, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
+      propertyPath: explosionPrefab
+      value: 
+      objectReference: {fileID: 1550340034180204004, guid: 83c2b28d41d124e45860319661da0c26, type: 3}
     - target: {fileID: 1691559466406857894, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1137,6 +1143,14 @@ PrefabInstance:
     - target: {fileID: 1691559466406857894, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6523069199050008515, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
+      propertyPath: m_SortingLayer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6523069199050008515, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 1950105717
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3652d9f11cdba8648b15a56bda8eebd3, type: 3}
