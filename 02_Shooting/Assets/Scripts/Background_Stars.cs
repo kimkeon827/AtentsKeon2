@@ -30,7 +30,7 @@ public class Background_Stars : Background
                 slot.Translate(Background_Stars_Width * bgStarsSlots.Length * transform.right);
             }
         }
-        int rand = Random.Range(0, 4);
+        int rand = Random.Range(0, 10);
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         sprite.flipX = ((rand & 0b_01) != 0);
         sprite.flipY = ((rand & 0b_10) != 0);
