@@ -17,8 +17,32 @@ public class Player : MonoBehaviour
     public float speed = 1.0f;      // 플레이어의 이동 속도(초당 이동 속도)
     public float fireInterval = 0.5f;
     public GameObject explosionPrefab;
+    public int initialLife = 3;
+    int life;
+
+    int Life
+    {
+        //get
+        //{
+        //      return life;
+        //}
+        get => life;    // 위의 4줄과 같은 코드
+        set
+        {
+            life = value;
+            if( life <= 0)  // 비교범위는 가능한 크게 잡는 쪽이 안전하다.
+            {
+                Dead();     // life가 0보다 작거나 같으면 죽는다
+            }
+        }
+        //int i = Life;   // i에다가 Life의 값을 가져와서 넣어라 => Life의 get이 실행된다. i = life; 와 같은 실행 결과가 된다.
+        //Life = 3;       // Life에 3을 넣어라 => Life의 set이 실행된다. life=3;과 같은 실행결과
+    }
+
     Vector3 dir;                    // 이동 방향(입력에 따라 변경됨)
     float boost = 1.0f;
+
+    bool isDead = false;
 
     //bool isFiring = false;
     //float fireTimeCount = 0.0f;
@@ -73,6 +97,9 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        life = initialLife;
+
+
         inputActions = new PlayerInputAction();
         rigid = GetComponent<Rigidbody2D>();    // 한번만 찾고 저장해서 계속 쓰기(메모리 더 쓰고 성능 아끼기)
         anim = GetComponent<Animator>();
@@ -106,6 +133,11 @@ public class Player : MonoBehaviour
     /// </summary>
     private void OnDisable()
     {
+        InputDisable();
+    }
+
+    void InputDisable()
+    {
         inputActions.Player.Boost.canceled -= OnBoostOff;
         inputActions.Player.Boost.performed -= OnBoostOn;
         inputActions.Player.Fire.canceled -= OnFireStop;
@@ -114,7 +146,6 @@ public class Player : MonoBehaviour
         inputActions.Player.Move.performed -= OnMove;
         inputActions.Player.Disable();  // 오브젝트가 사라질때 더 이상 입력을 받지 않도록 비활성화
     }
-
     /// <summary>
     /// 시작할 때. 첫번째 Update 함수가 실행되기 직전에 호출.
     /// </summary>
@@ -140,21 +171,29 @@ public class Player : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        //transform.Translate(speed * Time.fixedDeltaTime * dir);
+        if (!isDead)
+        {
+            //transform.Translate(speed * Time.fixedDeltaTime * dir);
 
-        // 이 스크립트 파일이 들어 있는 게임 오브젝트에서 Rigidbody2D 컴포넌트를 찾아 리턴.(없으면 null)
-        // 그런데 GetComponent는 무거운 함수 => (Update나 FixedUpdate처럼 주기적 또는 자주 호출되는 함수 안에서는 안쓰는 것이 좋다)
-        // Rigidbody2D rigid = GetComponent<Rigidbody2D>();    
+            // 이 스크립트 파일이 들어 있는 게임 오브젝트에서 Rigidbody2D 컴포넌트를 찾아 리턴.(없으면 null)
+            // 그런데 GetComponent는 무거운 함수 => (Update나 FixedUpdate처럼 주기적 또는 자주 호출되는 함수 안에서는 안쓰는 것이 좋다)
+            // Rigidbody2D rigid = GetComponent<Rigidbody2D>();    
 
-        // rigid.AddForce(speed * Time.fixedDeltaTime * dir); // 관성이 있는 움직임을 할 때 유용
-        rigid.MovePosition(transform.position + boost * speed * Time.fixedDeltaTime * dir); // 관성이 없는 움직임을 처리할 때 유용
+            // rigid.AddForce(speed * Time.fixedDeltaTime * dir); // 관성이 있는 움직임을 할 때 유용
+            rigid.MovePosition(transform.position + boost * speed * Time.fixedDeltaTime * dir); // 관성이 없는 움직임을 처리할 때 유용
 
-        //fireTimeCount += Time.fixedDeltaTime;
-        //if ( isFiring && fireTimeCount > fireInterval )
-        //{
-        //    Instantiate(bullet, transform.position, Quaternion.identity);
-        //    fireTimeCount = 0.0f;
-        //}
+            //fireTimeCount += Time.fixedDeltaTime;
+            //if ( isFiring && fireTimeCount > fireInterval )
+            //{
+            //    Instantiate(bullet, transform.position, Quaternion.identity);
+            //    fireTimeCount = 0.0f;
+            //}
+        }
+        else
+        {
+            rigid.AddForce(Vector2.left * 0.1f, ForceMode2D.Impulse);   // 죽었을 때 뒤로 돌면서 튕겨나가기
+            rigid.AddTorque(10.0f);
+        }
     }
 
     //private void OnCollisionEnter2D(Collision2D collision)
@@ -177,13 +216,22 @@ public class Player : MonoBehaviour
 
         if(collision.gameObject.CompareTag("Enemy"))
         {
-            Dead();
+
+            // 적이랑 부딪히면 life가 1 감소한다.
+            Life--;
+            Debug.Log($"플레이어의 Life는 {life}"); 
         }
     }
 
     void Dead()
     {
-        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        isDead = true;  
+        GetComponent<Collider2D>().enabled = false; // 더 이상 충돌 일어나지 않게 만들기
+        Instantiate(explosionPrefab, transform.position, Quaternion.identity);  // 폭발 이펙트 생성
+        InputDisable();                 // 입력 막고
+        rigid.gravityScale = 5.0f;      // 중력으로 떨어지게 만들기
+        rigid.freezeRotation = false;   // 회전 막아놓은 것 풀기
+        StopCoroutine(fireCoroutine);   // 총을 쏘던 중이면 더이상 쏘지 않게 처리
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
