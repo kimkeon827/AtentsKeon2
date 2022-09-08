@@ -120,6 +120,9 @@ public class Player : MonoBehaviour
     private Collider2D bodyCollider;
     private SpriteRenderer spriteRenderer;
 
+    // 델리게이트 --------------------------------------------------------------------------------------------------------
+    public Action<int> onLifeChange;
+
     // 프로퍼티 -----------------------------------------------------------------------------
     /// <summary>
     /// 생명갯수 용 프로퍼티. 0~3 사이의 값을 가진다.
@@ -134,16 +137,23 @@ public class Player : MonoBehaviour
         set
         {
             // value는 지금 set하는 값
-            if (life > value)
-            {
-                // life가 감소한 상황( 새로운 값(value)이 옛날 값(life)보다 작다 => 감소했다 )
-                StartCoroutine(EnterInvincibleMode());
-            }
+            if (life != value && !isDead) // 값에 변경이 일어났다.
+            {                               
+                if (life > value )   
+                {
+                    // life가 감소한 상황( 새로운 값(value)이 옛날 값(life)보다 작다 => 감소했다 )
+                    StartCoroutine(EnterInvincibleMode());
+                }
 
-            life = value;
-            if (life <= 0)  // 비교범위는 가능한 크게 잡는 쪽이 안전하다.
-            {
-                Dead();     // life가 0보다 작거나 같으면 죽는다
+                life = value;
+                if (life <= 0)  // 비교범위는 가능한 크게 잡는 쪽이 안전하다.
+                {
+                    life = 0;
+                    Dead();     // life가 0보다 작거나 같으면 죽는다
+                }
+
+                // (변수명)?. : 왼쪽 변수가 null이면 null. null이 아니면 (변수명) 멤버에 접근
+                onLifeChange?.Invoke(life); // 라이프가 변경될 때 onLifeChange 델리게이트에 등록된 함수들을 실행시킨다.
             }
         }
         //int i = Life;   // i에다가 Life의 값을 가져와서 넣어라 => Life의 get이 실행된다. i = life; 와 같은 실행 결과가 된다.
@@ -200,6 +210,7 @@ public class Player : MonoBehaviour
     {
         isDead = true;  // 죽었다고 표시
         bodyCollider.enabled = false; // 더 이상 충돌 일어나지 않게 만들기
+        gameObject.layer = LayerMask.NameToLayer("Player"); // 레이어도 플레이어로 원상복구
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);  // 폭발 이펙트 생성
         InputDisable();                 // 입력 막고
         rigid.gravityScale = 5.0f;      // 중력으로 떨어지게 만들기
@@ -229,7 +240,8 @@ public class Player : MonoBehaviour
     /// <returns></returns>
     IEnumerator EnterInvincibleMode()
     {
-        bodyCollider.enabled = false;       // 충돌이 안일어나게 만들기
+        //bodyCollider.enabled = false;       // 충돌이 안일어나게 만들기
+        gameObject.layer = LayerMask.NameToLayer("Invincible");
         isInvincibleMode = true;            // 무적모드 켜기
         timeElapsed = 0.0f;                 // 타이머 초기화
 
@@ -237,7 +249,8 @@ public class Player : MonoBehaviour
 
         spriteRenderer.color = Color.white;     // 원래 색으로 되돌리기
         isInvincibleMode = false;               // 무적모드 끄기
-        bodyCollider.enabled = true;            // 충돌이 다시 발생하게 만들기
+        gameObject.layer = LayerMask.NameToLayer("Player");
+        bodyCollider.enabled = !isDead;           // 살아있을 때만 충돌이 다시 발생하게 만들기
     }
 
     /// <summary>
