@@ -114,6 +114,11 @@ public class Player : MonoBehaviour
     /// </summary>
     private IEnumerator fireCoroutine;
 
+    /// <summary>
+    /// 플레이어가 획득한 점수
+    /// </summary>
+    public int totalScore = 0;
+
     // 컴포넌트들----------------------------------------------------------------------------------------------------------
     private Rigidbody2D rigid;
     private Animator anim;
@@ -122,6 +127,7 @@ public class Player : MonoBehaviour
 
     // 델리게이트 --------------------------------------------------------------------------------------------------------
     public Action<int> onLifeChange;
+    public Action<int> onScoreChange;
 
     // 프로퍼티 -----------------------------------------------------------------------------
     /// <summary>
@@ -202,6 +208,15 @@ public class Player : MonoBehaviour
 
     // 함수(메서드) -----------------------------------------------------------------------------
    
+    public void AddScore(int score)
+    {
+        totalScore += score;
+
+        onScoreChange?.Invoke(totalScore);
+
+        // 1. 이벤트가 발생하는 곳 ( 델리게이트 작성) -> 신호만 보내기
+        // 2. 실제 액션이 일어나는 곳 ( 델리게이트에 함수 등록)
+    }
 
     /// <summary>
     /// 플레이어가 죽었을 때 실행될 일들
@@ -405,6 +420,8 @@ public class Player : MonoBehaviour
     {
         Power = 1;  // 시작할 때 파워를 1로 설정(발사 위치 갱신용)
         life = initialLife; // 생명숫자도 초기화
+        totalScore = 0; // 점수 초기화
+        AddScore(0);    // UI 갱신용
     }
 
     /// <summary>
