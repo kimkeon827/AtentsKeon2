@@ -19,7 +19,7 @@ public class ScorePanel : MonoBehaviour
     private void Start()
     {
         Player player = FindObjectOfType<Player>();
-        player.onScoreChange += RefreshScore;
+        player.onScoreChange += SetTargetScore;
 
         targetScore = 0;
         currentScore = 0.0f;
@@ -28,13 +28,13 @@ public class ScorePanel : MonoBehaviour
     private void Update()
     {
         // 1 프레임 : 화면에 그릴 그림 한장.
-        if( currentScore < targetScore)
+        if( currentScore < targetScore) // currentScore가 targetScore보다 무조건 작거나 같도록 변경
         {
-            currentScore += Time.deltaTime;
+            currentScore += Time.deltaTime; // currentScore 증가시키기
 
             currentScore = Mathf.Min(currentScore, targetScore);      // currentScore가 targetScore보다 무조건 작거나 같도록 변경.
 
-            scoreText.text = $"{currentScore: f0}";
+            scoreText.text = $"{currentScore:f0}";  // UI에 출력
         }
     }
     private void SetTargetScore(int newScore)
