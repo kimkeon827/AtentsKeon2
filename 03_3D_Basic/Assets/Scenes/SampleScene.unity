@@ -840,6 +840,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   rotateSpeed: 180
+  jumpPower: 5
 --- !u!54 &1466453658
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -854,7 +855,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &1466453661
 MonoBehaviour:
@@ -885,6 +886,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: b0782324-612a-4af6-8e5e-51d4c96e910a
     m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c42cbdc4-6e94-46d0-80a3-ebd083e9b332
+    m_ActionName: Player/Jump[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player

@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 5.0f;
     public float rotateSpeed = 180.0f;
+    public float jumpPower = 3.0f;
 
     float moveDir = 0.0f;
     float rotateDir = 0.0f;
@@ -27,14 +28,17 @@ public class Player : MonoBehaviour
         inputActions.Player.Enable();   // Player 액션맵에 들어있는 액션들을 처리하겠다.
         inputActions.Player.Move.performed += OnMoveInput;  // Move 액션에 연결된 키가 눌러졌을 때 실행되는 함수를 연결 ( 바인딩)
         inputActions.Player.Move.canceled += OnMoveInput;
+        inputActions.Player.Jump.performed += OnJumpInput;
     }
 
+    
 
     private void OnDisable()
     {
         inputActions.Player.Move.performed -= OnMoveInput;  // 바인딩 해제
         inputActions.Player.Disable(); // Player 액션맵에 있는 액션들은 처리하지 않겠다.
         inputActions.Player.Move.canceled -= OnMoveInput;
+        inputActions.Player.Jump.performed -= OnJumpInput;
     }
 
     private void FixedUpdate()
@@ -49,6 +53,12 @@ public class Player : MonoBehaviour
         //Debug.Log(input);
         moveDir = input.y;      // w : +1, s : -1   전진인지 후진인지 결정
         rotateDir = input.x;    // a : -1, d : +1   좌회전인지 우회전인지 결정
+    }
+
+    private void OnJumpInput(InputAction.CallbackContext _)
+    {
+        // 플레이어의 위쪽 방향(up)으로 jumppower만큼 즉시 힘을 추가한다.(질량 영향 있음)
+        rigid.AddForce(transform.up * jumpPower , ForceMode.Impulse);
     }
 
     private void Move()
